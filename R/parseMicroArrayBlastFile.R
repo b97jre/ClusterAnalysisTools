@@ -32,15 +32,21 @@ blastOutput$match = ((blastOutput$V8-blastOutput$V7+1)*(blastOutput$V3/100))/oli
 # only keep the ones with the same AT.G..... name
 
 BlastOutputOrdered = blastOutput[with(blastOutput, order(V1, -match)), ]
-
+head(BlastOutputOrdered)
 BlastOutputOrderedSingle = BlastOutputOrdered[ !duplicated(BlastOutputOrdered$V1), ]
+dim(BlastOutputOrderedSingle)
 
 BlastOutputOrderedSingleGood = BlastOutputOrderedSingle[which(BlastOutputOrderedSingle$match >0.5), ]
 BlastOutputOrderedSingleGood$location = (BlastOutputOrderedSingleGood[[9]]+BlastOutputOrderedSingleGood[[10]]) /2
 BlastOutputOrderedSingleGood$dir = "+"
 BlastOutputOrderedSingleGood$dir[which(BlastOutputOrderedSingleGood[[9]]-BlastOutputOrderedSingleGood[[10]] > 0)] = "-"
 BlastOutputOrderedSingleGood$TAIR10Name = "noHit"
-head(BlastOutputOrderedSingleGood)
+dim(BlastOutputOrderedSingleGood)
+
+which(BlastOutputOrderedSingleGood$location == 1289804)
+
+i = 322
+BlastOutputOrderedSingleGood[322,]
 
 
 for(i in 1: length(BlastOutputOrderedSingleGood[[1]])){
