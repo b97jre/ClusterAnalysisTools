@@ -139,7 +139,7 @@ colnames(finalOutput) <- FinalColNames
 
 write.table(finalOutput,file="Merged_Final_Table.tab.txt", sep="\t", quote =  FALSE,row.names=FALSE)
 
-
+genesOnArray
 
 head(finalOutput)
 

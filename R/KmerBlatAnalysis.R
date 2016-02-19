@@ -1,7 +1,15 @@
 setwd("/Users/johanreimegard/Vetenskap/Data/clusterProject/promoterRegions")
 
+#AT2G01008.1     ATTED42 +       1121    1128
+
+BlatSevenMers = read.table(file = 'ATTED-II-7MERS.Athaliana_167_gene.gff3.upstream.1000.psl', skip = 5)
+dim(BlatSevenMers)
+
 EightMers = read.table(file = 'Athaliana_167_gene.gff3.upstream.1000.fa.fa_At_reliable_REGmotifs.fasta.matches')
 SevenMers = read.table(file = 'Athaliana_167_gene.gff3.upstream.1000.fa.fa_ATTED-II-7MERS.fa.matches')
+dim(SevenMers)
+
+#AT2G01008.1     ATTED42 +       1121    1128
 
 
 
@@ -14,7 +22,7 @@ SevenMers$Genes = ll[seq(from = 1, to = length(ll)-1, by = 2)]
 
 class(SevenMers$Genes)
 
-
+head(SevenMers)
 
 GenesInCluster = read.table(file = 'ClusterNrAndGenesInvolved.txt',  sep = "\t")
 NrOfClusters = strsplit(as.character(GenesInCluster$V3),",")

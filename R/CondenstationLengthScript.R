@@ -5,21 +5,55 @@ setwd("/Users/johanreimegard/Vetenskap/Data/clusterProject/QPCR_values")
 
 CondensationValues = read.table("Condensation measurements_JR.txt", sep = "\t", header =  TRUE)
 
-CondensationValuesTapetal =CondensationValues[CondensationValues$CellType =="Tapetal",] 
 
-p1 = ggplot(CondensationValuesTapetal, aes(x = factor(Stage), fill = factor(Treatment), y = nm),order=factor(Sample)) 
+
+#CondensationValuesTapetal =CondensationValues[CondensationValues$CellType =="Tapetal",] 
+
+CondensationValues$Stage[CondensationValues$CellType =="non-tapetal"] = "non-tapetal"
+
+CondensationValues$Cluster[CondensationValues$CellType =="non-tapetal"] = "#3 non-tapetal"
+CondensationValues$Cluster[CondensationValues$Cluster ==3] = "#3 tapetal"
+CondensationValues$Cluster[CondensationValues$Cluster ==15] = "#15 tapetal"
+
+CondensationValues$Cluster= factor(CondensationValues$Cluster, levels = c("#3 non-tapetal", "#3 tapetal", "#15 tapetal"),ordered = TRUE)
+
+CondensationValues$Treatment <- factor(CondensationValuesTapetal$Treatment,
+                                              levels = c("Mock","DEX"),ordered = TRUE)
+
+#CondensationValuesTapetal$lnm = log(CondensationValuesTapetal$nm)
+
+#reverse(levels(factor(CondensationValuesTapetal$Treatment)))
+p1 = ggplot(CondensationValues, aes(x = factor(Stage), fill = Treatment, y = nm))
 p1 + geom_violin(adjust=1) + facet_grid(. ~ Cluster)+
   ggtitle("Condensation of cluster") + 
   theme(plot.title = element_text( face="bold"),legend.title=element_blank())+
   ylab("Length(nm)")+
+  ylim(c(0,900))+
+  scale_fill_manual(values = c("purple","yellow"))+
   xlab("Floral stages")+ theme(legend.title=element_blank())
-ggsave(filename = "Floral_stages_distribution_Tapetal.pdf")
+ggsave(filename = "Floral_stages_distribution_both_Clusters.pdf")
 
 
+CondensationValues3 <- CondensationValues[CondensationValues$Cluster != "#15 tapetal" ,]
+CT = as.character(CondensationValues3$CellType)
+CT[CT != "Tapetal"] = "Non-tapetal"
+CondensationValues3$CellType = factor(CT)
 
-    CondensationValuesNonTapetal =CondensationValues[CondensationValues$CellType !="Tapetal",] 
+p1 = ggplot(CondensationValues3, aes(x = factor(CellType), fill = Treatment, y = nm))
+p1 + geom_violin(adjust=1, )+
+  ggtitle("Condensation of cluster 3 in different tissues") + 
+  theme(plot.title = element_text( face="bold"),legend.title=element_blank())+
+  ylab("Length(nm)")+
+  ylim(c(0,900))+
+  scale_fill_manual(values = c("purple","yellow"))+
+  xlab("Tissue")+ theme(legend.title=element_blank())
+ggsave(filename = "Floral_stages_distribution_Tapetal_cluster3_merged_stages.pdf")
+
+
+  CondensationValuesNonTapetal =CondensationValues[CondensationValues$CellType !="Tapetal",] 
 
 p1 = ggplot(CondensationValuesTapetal, aes(x = factor(Stage), fill = factor(Treatment), y = nm),order=factor(Sample)) 
+
 
 
 
@@ -55,6 +89,39 @@ DEX_KS_pvalues[2,4] = ks.test.Treatment(info =CondensationValues, Stage = 11,Cel
 Celltype= "Tapetal"
 Stage = "10"
 Cluster = "3"
+
+
+
+
+# analysis for difference between tapetal and non-tapetal 
+testCluster = CondensationValues[CondensationValues$Cluster != "#15 tapetal", ]
+testClusterDEX = testCluster[testCluster$Treatment == "DEX", ]
+testClusterMOCK = testCluster[testCluster$Treatment != "DEX", ]
+testClusterNT = testCluster[testCluster$Cluster == "#3 non-tapetal", ]
+testClusterT = testCluster[testCluster$Cluster == "#3 tapetal", ]
+
+x = testClusterDEX$nm[testClusterDEX$Cluster == "#3 tapetal"]
+y = testClusterDEX$nm[testClusterDEX$Cluster == "#3 non-tapetal"]
+ks_results = ks.test(x, y)
+ks_results$p.value
+
+x = testClusterMOCK$nm[testClusterMOCK$Cluster == "#3 tapetal"]
+y = testClusterMOCK$nm[testClusterMOCK$Cluster == "#3 non-tapetal"]
+ks_results = ks.test(x, y)
+ks_results$p.value
+
+x = testClusterNT$nm[testClusterNT$Treatment == "DEX"]
+y = testClusterNT$nm[testClusterNT$Treatment != "DEX"]
+ks_results = ks.test(x, y)
+ks_results$p.value
+
+x = testClusterT$nm[testClusterT$Treatment == "DEX"]
+y = testClusterT$nm[testClusterT$Treatment != "DEX"]
+ks_results = ks.test(x, y)
+ks_results$p.value
+
+
+
 
 
 ks.test.Treatment <- function(info, Stage = "all",  Celltype= "all", Cluster = "all"){
